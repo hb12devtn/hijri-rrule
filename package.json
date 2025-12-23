@@ -1,0 +1,63 @@
+{
+  "name": "hijri-rrule",
+  "version": "1.0.0",
+  "description": "A JavaScript library for working with recurrence rules (RRULE) for the Hijri (Islamic) calendar, compatible with RFC 5545",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "demo": "npx serve -l 3000",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "rrule",
+    "recurrence",
+    "hijri",
+    "islamic",
+    "calendar",
+    "icalendar",
+    "rfc5545",
+    "date",
+    "recurring"
+  ],
+  "author": "hb12devtn",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hb12devtn/hijri-rrule.git"
+  },
+  "homepage": "https://hb12devtn.github.io/hijri-rrule",
+  "bugs": {
+    "url": "https://github.com/hb12devtn/hijri-rrule/issues"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}

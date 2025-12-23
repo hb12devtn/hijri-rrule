@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hijri RRULE Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .rtl { direction: rtl; text-align: right; }
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 3px; }
+    .dark .scrollbar-thin::-webkit-scrollbar-thumb { background: #374151; }
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+    /* End Condition Toggle Styles */
+    .end-condition-toggle {
+      background-color: white;
+      border-color: #d1d5db;
+      color: #374151;
+      transition: all 0.2s;
+    }
+    .dark .end-condition-toggle {
+      background-color: #374151;
+      border-color: #4b5563;
+      color: #d1d5db;
+    }
+    .end-condition-toggle.active {
+      background-color: #059669;
+      border-color: #059669;
+      color: white;
+    }
+    .dark .end-condition-toggle.active {
+      background-color: #10b981;
+      border-color: #10b981;
+      color: white;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-primary-600 dark:text-primary-400">Hijri RRULE</h1>
+          <p class="text-sm text-gray-500 dark:text-gray-400">RFC 5545 Recurrence Rules for the Islamic Calendar</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="https://github.com/hb12devtn/hijri-rrule" target="_blank" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+          <button id="themeToggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+            <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>
+            <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Input Panel -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-semibold text-primary-600 dark:text-primary-400">Rule Configuration</h2>
+        </div>
+
+        <div class="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-thin">
+
+          <!-- Presets -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quick Presets</label>
+            <select id="presets" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+              <option value="">-- Select a preset --</option>
+              <option value="ramadan-1st">1st Ramadan Yearly</option>
+              <option value="jumuah">Every Friday (Jumu'ah)</option>
+              <option value="monthly-15">15th of Every Month</option>
+              <option value="eid-fitr">Eid al-Fitr (1st Shawwal)</option>
+              <option value="eid-adha">Eid al-Adha (10th Dhu al-Hijjah)</option>
+              <option value="arafah">Day of Arafah (9th Dhu al-Hijjah)</option>
+              <option value="ashura">Day of Ashura (10th Muharram)</option>
+            </select>
+          </div>
+
+          <!-- Frequency -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frequency</label>
+            <select id="freq" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+              <option value="0">Yearly</option>
+              <option value="1">Monthly</option>
+              <option value="2">Weekly</option>
+              <option value="3">Daily</option>
+            </select>
+          </div>
+
+          <!-- Start Date -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date (Hijri)</label>
+            <div class="grid grid-cols-3 gap-3">
+              <input type="number" id="dtstart-year" value="1446" min="1" max="2000"
+                class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Year">
+              <select id="dtstart-month" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <option value="1">1 - Muharram</option>
+                <option value="2">2 - Safar</option>
+                <option value="3">3 - Rabi' al-Awwal</option>
+                <option value="4">4 - Rabi' al-Thani</option>
+                <option value="5">5 - Jumada al-Awwal</option>
+                <option value="6">6 - Jumada al-Thani</option>
+                <option value="7">7 - Rajab</option>
+                <option value="8">8 - Sha'ban</option>
+                <option value="9" selected>9 - Ramadan</option>
+                <option value="10">10 - Shawwal</option>
+                <option value="11">11 - Dhu al-Qa'dah</option>
+                <option value="12">12 - Dhu al-Hijjah</option>
+              </select>
+              <input type="number" id="dtstart-day" value="1" min="1" max="30"
+                class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Day">
+            </div>
+          </div>
+
+          <!-- Interval -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Interval</label>
+            <input type="number" id="interval" value="1" min="1" max="999"
+              class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          </div>
+
+          <!-- End Condition -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Condition</label>
+            <!-- Toggle Button Group -->
+            <div class="flex mb-3">
+              <button type="button" id="end-condition-count"
+                class="flex-1 px-4 py-2 text-sm font-medium rounded-l-lg border end-condition-toggle active">
+                Count
+              </button>
+              <button type="button" id="end-condition-until"
+                class="flex-1 px-4 py-2 text-sm font-medium rounded-r-lg border-t border-r border-b end-condition-toggle">
+                Until Day
+              </button>
+            </div>
+
+            <!-- Count Input (shown by default) -->
+            <div id="count-container">
+              <input type="number" id="count" value="10" min="1" max="999"
+                class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            </div>
+
+            <!-- Until Date Input (hidden by default) -->
+            <div id="until-container" class="hidden">
+              <div class="grid grid-cols-3 gap-3">
+                <input type="number" id="until-year" placeholder="Year" min="1" max="2000"
+                  class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <select id="until-month" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                  <option value="">Month</option>
+                  <option value="1">1 - Muharram</option>
+                  <option value="2">2 - Safar</option>
+                  <option value="3">3 - Rabi' al-Awwal</option>
+                  <option value="4">4 - Rabi' al-Thani</option>
+                  <option value="5">5 - Jumada al-Awwal</option>
+                  <option value="6">6 - Jumada al-Thani</option>
+                  <option value="7">7 - Rajab</option>
+                  <option value="8">8 - Sha'ban</option>
+                  <option value="9">9 - Ramadan</option>
+                  <option value="10">10 - Shawwal</option>
+                  <option value="11">11 - Dhu al-Qa'dah</option>
+                  <option value="12">12 - Dhu al-Hijjah</option>
+                </select>
+                <input type="number" id="until-day" placeholder="Day" min="1" max="30"
+                  class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+            </div>
+          </div>
+
+          <!-- Skip (Invalid Day Strategy) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Skip (Invalid Day)</label>
+            <select id="skip" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              <option value="omit" selected>Omit (default)</option>
+              <option value="forward">Forward (1st of next month)</option>
+              <option value="backward">Backward (last day of month)</option>
+            </select>
+          </div>
+
+          <!-- Calendar Type -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Calendar Type</label>
+            <select id="calendar" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              <option value="islamic-umalqura" selected>Umm al-Qura (Saudi Official)</option>
+              <option value="islamic-tbla">Tabular (Algorithmic)</option>
+            </select>
+          </div>
+
+          <!-- Week Start -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Week Start</label>
+            <select id="wkst" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              <option value="0">Saturday</option>
+              <option value="1" selected>Sunday</option>
+              <option value="2">Monday</option>
+              <option value="3">Tuesday</option>
+              <option value="4">Wednesday</option>
+              <option value="5">Thursday</option>
+              <option value="6">Friday</option>
+            </select>
+          </div>
+
+          <!-- By Month -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">By Month</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="1" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Muharram</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="2" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Safar</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="3" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Rabi' I</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="4" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Rabi' II</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="5" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Jumada I</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="6" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Jumada II</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="7" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Rajab</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="8" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Sha'ban</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="9" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Ramadan</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="10" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Shawwal</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="11" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Dhu al-Qa'dah</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" value="12" class="bymonth rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500">
+                <span>Dhu al-Hijjah</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- By Monthday -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">By Month Day</label>
+            <input type="number" id="bymonthday" min="1" max="30" placeholder="1-30"
+              class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          </div>
+
+          <!-- By Weekday -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">By Weekday</label>
+            <div class="flex flex-wrap gap-2">
+              <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <input type="checkbox" value="0" class="byweekday rounded bg-white dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-primary-500 focus:ring-primary-500">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Sat</span>
+              </label>
+              <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <input type="checkbox" value="1" class="byweekday rounded bg-white dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-primary-500 focus:ring-primary-500">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Sun</span>
+              </label>
+              <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <input type="checkbox" value="2" class="byweekday rounded bg-white dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-primary-500 focus:ring-primary-500">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Mon</span>
+              </label>
+              <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <input type="checkbox" value="3" class="byweekday rounded bg-white dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-primary-500 focus:ring-primary-500">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Tue</span>
+              </label>
+              <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <input type="checkbox" value="4" class="byweekday rounded bg-white dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-primary-500 focus:ring-primary-500">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Wed</span>
+              </label>
+              <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <input type="checkbox" value="5" class="byweekday rounded bg-white dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-primary-500 focus:ring-primary-500">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Thu</span>
+              </label>
+              <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <input type="checkbox" value="6" class="byweekday rounded bg-white dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-primary-500 focus:ring-primary-500">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Fri</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- By Set Position -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">By Set Position</label>
+            <input type="number" id="bysetpos" placeholder="e.g. 1, -1"
+              class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          </div>
+
+          <!-- RRULE String Input -->
+          <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">RRULE String</label>
+            <textarea id="rruleInput" rows="3" placeholder="FREQ=YEARLY;BYMONTH=9;BYMONTHDAY=1;COUNT=10"
+              class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm resize-none"></textarea>
+            <div class="flex gap-2 mt-3">
+              <button id="parseBtn" class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors">
+                Parse RRULE
+              </button>
+              <button id="clearBtn" class="px-4 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white font-medium rounded-lg transition-colors">
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-semibold text-primary-600 dark:text-primary-400">Output</h2>
+        </div>
+
+        <div class="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-thin">
+
+          <!-- RRULE String Output -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">RRULE String</label>
+              <button class="copy-btn text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300" data-target="rruleOutput">Copy</button>
+            </div>
+            <pre id="rruleOutput" class="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 text-sm font-mono text-primary-700 dark:text-primary-300 overflow-x-auto whitespace-pre-wrap break-all"></pre>
+          </div>
+
+          <!-- English Text -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Human Readable (English)</label>
+              <button class="copy-btn text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300" data-target="textEnOutput">Copy</button>
+            </div>
+            <div id="textEnOutput" class="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 text-sm text-gray-800 dark:text-gray-200"></div>
+          </div>
+
+          <!-- Arabic Text -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Human Readable (Arabic)</label>
+              <button class="copy-btn text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300" data-target="textArOutput">Copy</button>
+            </div>
+            <div id="textArOutput" class="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 text-sm text-gray-800 dark:text-gray-200 rtl font-arabic"></div>
+          </div>
+
+          <!-- Occurrences -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Occurrences</label>
+              <span id="occurrenceCount" class="text-xs text-gray-500 dark:text-gray-400"></span>
+            </div>
+            <div id="occurrencesOutput" class="bg-gray-100 dark:bg-gray-900 rounded-lg divide-y divide-gray-200 dark:divide-gray-800 max-h-96 overflow-y-auto scrollbar-thin"></div>
+          </div>
+
+          <!-- Error Display -->
+          <div id="errorDisplay" class="hidden bg-red-100 dark:bg-red-900/50 border border-red-300 dark:border-red-700 rounded-lg p-4 text-red-700 dark:text-red-200 text-sm"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-200 dark:border-gray-800 mt-8">
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-gray-500 text-sm">
+      <p>Hijri RRULE - RFC 5545 Recurrence Rules for the Islamic Calendar</p>
+      <p class="mt-1">Built with the <a href="#" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">hijri-rrule</a> library</p>
+    </div>
+  </footer>
+
+  <!-- Library Script -->
+  <script type="module">
+    // Import the library
+    import { HijriRRule, HijriDate, toText, gregorianToHijri } from 'https://unpkg.com/hijri-rrule@1/dist/index.mjs';
+
+    // Expose to window for debugging
+    window.HijriRRule = HijriRRule;
+    window.HijriDate = HijriDate;
+
+    // Constants
+    const WEEKDAYS = [
+      HijriRRule.SA, HijriRRule.SU, HijriRRule.MO,
+      HijriRRule.TU, HijriRRule.WE, HijriRRule.TH, HijriRRule.FR
+    ];
+
+    const MONTH_NAMES = [
+      'Muharram', 'Safar', "Rabi' al-Awwal", "Rabi' al-Thani",
+      'Jumada al-Awwal', 'Jumada al-Thani', 'Rajab', "Sha'ban",
+      'Ramadan', 'Shawwal', "Dhu al-Qa'dah", 'Dhu al-Hijjah'
+    ];
+
+    const PRESETS = {
+      'ramadan-1st': {
+        freq: 0, bymonth: [9], bymonthday: 1,
+        dtstartMonth: 9, dtstartDay: 1
+      },
+      'jumuah': {
+        freq: 2, byweekday: [6],
+        dtstartMonth: 1, dtstartDay: 1
+      },
+      'monthly-15': {
+        freq: 1, bymonthday: 15,
+        dtstartMonth: 1, dtstartDay: 15
+      },
+      'eid-fitr': {
+        freq: 0, bymonth: [10], bymonthday: 1,
+        dtstartMonth: 10, dtstartDay: 1
+      },
+      'eid-adha': {
+        freq: 0, bymonth: [12], bymonthday: 10,
+        dtstartMonth: 12, dtstartDay: 10
+      },
+      'arafah': {
+        freq: 0, bymonth: [12], bymonthday: 9,
+        dtstartMonth: 12, dtstartDay: 9
+      },
+      'ashura': {
+        freq: 0, bymonth: [1], bymonthday: 10,
+        dtstartMonth: 1, dtstartDay: 10
+      }
+    };
+
+    // DOM Elements
+    const els = {
+      presets: document.getElementById('presets'),
+      freq: document.getElementById('freq'),
+      dtstartYear: document.getElementById('dtstart-year'),
+      dtstartMonth: document.getElementById('dtstart-month'),
+      dtstartDay: document.getElementById('dtstart-day'),
+      interval: document.getElementById('interval'),
+      count: document.getElementById('count'),
+      untilYear: document.getElementById('until-year'),
+      untilMonth: document.getElementById('until-month'),
+      untilDay: document.getElementById('until-day'),
+      endConditionCount: document.getElementById('end-condition-count'),
+      endConditionUntil: document.getElementById('end-condition-until'),
+      countContainer: document.getElementById('count-container'),
+      untilContainer: document.getElementById('until-container'),
+      skip: document.getElementById('skip'),
+      calendar: document.getElementById('calendar'),
+      wkst: document.getElementById('wkst'),
+      bymonth: document.querySelectorAll('.bymonth'),
+      bymonthday: document.getElementById('bymonthday'),
+      byweekday: document.querySelectorAll('.byweekday'),
+      bysetpos: document.getElementById('bysetpos'),
+      rruleInput: document.getElementById('rruleInput'),
+      parseBtn: document.getElementById('parseBtn'),
+      clearBtn: document.getElementById('clearBtn'),
+      rruleOutput: document.getElementById('rruleOutput'),
+      textEnOutput: document.getElementById('textEnOutput'),
+      textArOutput: document.getElementById('textArOutput'),
+      occurrencesOutput: document.getElementById('occurrencesOutput'),
+      occurrenceCount: document.getElementById('occurrenceCount'),
+      errorDisplay: document.getElementById('errorDisplay'),
+      themeToggle: document.getElementById('themeToggle'),
+      copyBtns: document.querySelectorAll('.copy-btn')
+    };
+
+    // Set end condition mode (count or until)
+    function setEndCondition(mode) {
+      if (mode === 'count') {
+        els.endConditionCount.classList.add('active');
+        els.endConditionUntil.classList.remove('active');
+        els.countContainer.classList.remove('hidden');
+        els.untilContainer.classList.add('hidden');
+      } else {
+        els.endConditionUntil.classList.add('active');
+        els.endConditionCount.classList.remove('active');
+        els.untilContainer.classList.remove('hidden');
+        els.countContainer.classList.add('hidden');
+      }
+      updateOutput();
+    }
+
+    // Get current form values
+    function getFormValues() {
+      const bymonth = [...els.bymonth].filter(cb => cb.checked).map(cb => parseInt(cb.value));
+      const byweekday = [...els.byweekday].filter(cb => cb.checked).map(cb => WEEKDAYS[parseInt(cb.value)]);
+
+      const options = {
+        freq: parseInt(els.freq.value),
+        dtstart: new HijriDate(
+          parseInt(els.dtstartYear.value) || 1446,
+          parseInt(els.dtstartMonth.value) || 1,
+          parseInt(els.dtstartDay.value) || 1
+        ),
+        interval: parseInt(els.interval.value) || 1,
+        wkst: WEEKDAYS[parseInt(els.wkst.value)]
+      };
+
+      // Add end condition based on toggle state
+      const isCountMode = els.endConditionCount.classList.contains('active');
+      if (isCountMode) {
+        options.count = parseInt(els.count.value) || 10;
+      } else {
+        const untilYear = parseInt(els.untilYear.value) || 1456;
+        const untilMonth = parseInt(els.untilMonth.value) || 12;
+        const untilDay = parseInt(els.untilDay.value) || 29;
+        options.until = new HijriDate(untilYear, untilMonth, untilDay);
+      }
+      if (bymonth.length > 0) options.bymonth = bymonth;
+      if (els.bymonthday.value) options.bymonthday = parseInt(els.bymonthday.value);
+      if (byweekday.length > 0) options.byweekday = byweekday;
+      if (els.bysetpos.value) options.bysetpos = parseInt(els.bysetpos.value);
+
+      // Add skip strategy
+      options.skip = els.skip.value;
+
+      // Add calendar type
+      options.calendar = els.calendar.value;
+
+      return options;
+    }
+
+    // Update output
+    function updateOutput() {
+      try {
+        els.errorDisplay.classList.add('hidden');
+
+        const options = getFormValues();
+        const rule = new HijriRRule(options);
+
+        // RRULE String
+        els.rruleOutput.textContent = rule.toString();
+
+        // Human readable text
+        els.textEnOutput.textContent = toText(rule.options, 'en');
+        els.textArOutput.textContent = toText(rule.options, 'ar');
+
+        // Occurrences
+        const hijriDates = rule.allHijri();
+        els.occurrenceCount.textContent = `${hijriDates.length} occurrence${hijriDates.length !== 1 ? 's' : ''}`;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        els.occurrencesOutput.innerHTML = hijriDates.map((hd, i) => {
+          const gd = hd.toGregorian();
+          return `
+            <div class="p-3 flex items-center justify-between hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+              <div>
+                <span class="text-primary-600 dark:text-primary-300 font-medium">${i + 1}.</span>
+                <span class="text-gray-900 dark:text-white ml-2">${hd.toLocaleDateString('en')}</span>
+              </div>
+              <div class="text-gray-500 dark:text-gray-400 text-sm">
+                ${gd.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        els.errorDisplay.textContent = error.message;
+        els.errorDisplay.classList.remove('hidden');
+        els.rruleOutput.textContent = '';
+        els.textEnOutput.textContent = '';
+        els.textArOutput.textContent = '';
+        els.occurrencesOutput.innerHTML = '';
+        els.occurrenceCount.textContent = '';
+      }
+    }
+
+    // Parse RRULE string
+    function parseRRule() {
+      try {
+        const str = els.rruleInput.value.trim();
+        if (!str) return;
+
+        const rule = HijriRRule.fromString(str);
+        const opts = rule.options;
+
+        // Update form
+        els.freq.value = opts.freq;
+        els.dtstartYear.value = opts.dtstart.year;
+        els.dtstartMonth.value = opts.dtstart.month;
+        els.dtstartDay.value = opts.dtstart.day;
+        els.interval.value = opts.interval || 1;
+        els.count.value = opts.count || '10';
+        els.untilYear.value = opts.until ? opts.until.year : '';
+        els.untilMonth.value = opts.until ? opts.until.month : '';
+        els.untilDay.value = opts.until ? opts.until.day : '';
+
+        // Set toggle based on whether count or until is present
+        if (opts.until) {
+          setEndCondition('until');
+        } else {
+          setEndCondition('count');
+        }
+
+        // Find wkst index
+        const wkstIndex = opts.wkst ? WEEKDAYS.findIndex(w => w.weekday === opts.wkst.weekday) : 1;
+        els.wkst.value = wkstIndex >= 0 ? wkstIndex : 1;
+
+        // Bymonth
+        els.bymonth.forEach(cb => {
+          cb.checked = opts.bymonth && opts.bymonth.includes(parseInt(cb.value));
+        });
+
+        // Bymonthday
+        els.bymonthday.value = opts.bymonthday ? (Array.isArray(opts.bymonthday) ? opts.bymonthday[0] : opts.bymonthday) : '';
+
+        // Byweekday
+        els.byweekday.forEach(cb => {
+          const idx = parseInt(cb.value);
+          cb.checked = opts.byweekday && opts.byweekday.some(w => {
+            const weekdayVal = typeof w === 'number' ? w : (w.weekday !== undefined ? w.weekday : w);
+            return weekdayVal === idx;
+          });
+        });
+
+        // Bysetpos
+        els.bysetpos.value = opts.bysetpos ? (Array.isArray(opts.bysetpos) ? opts.bysetpos[0] : opts.bysetpos) : '';
+
+        updateOutput();
+      } catch (error) {
+        els.errorDisplay.textContent = 'Parse error: ' + error.message;
+        els.errorDisplay.classList.remove('hidden');
+      }
+    }
+
+    // Clear form
+    function clearForm() {
+      els.presets.value = '';
+      els.freq.value = '0';
+      els.dtstartYear.value = '1446';
+      els.dtstartMonth.value = '9';
+      els.dtstartDay.value = '1';
+      els.interval.value = '1';
+      els.count.value = '10';
+      els.untilYear.value = '';
+      els.untilMonth.value = '';
+      els.untilDay.value = '';
+      els.wkst.value = '1';
+      els.bymonth.forEach(cb => cb.checked = false);
+      els.bymonthday.value = '';
+      els.byweekday.forEach(cb => cb.checked = false);
+      els.bysetpos.value = '';
+      els.rruleInput.value = '';
+      els.skip.value = 'omit';
+      els.calendar.value = 'islamic-umalqura';
+      // Reset toggle to count mode
+      els.endConditionCount.classList.add('active');
+      els.endConditionUntil.classList.remove('active');
+      els.countContainer.classList.remove('hidden');
+      els.untilContainer.classList.add('hidden');
+      updateOutput();
+    }
+
+    // Apply preset
+    function applyPreset(presetId) {
+      if (!presetId || !PRESETS[presetId]) return;
+
+      const preset = PRESETS[presetId];
+      clearForm();
+
+      els.freq.value = preset.freq;
+      if (preset.dtstartMonth) els.dtstartMonth.value = preset.dtstartMonth;
+      if (preset.dtstartDay) els.dtstartDay.value = preset.dtstartDay;
+
+      if (preset.bymonth) {
+        els.bymonth.forEach(cb => {
+          cb.checked = preset.bymonth.includes(parseInt(cb.value));
+        });
+      }
+
+      if (preset.bymonthday) els.bymonthday.value = preset.bymonthday;
+
+      if (preset.byweekday) {
+        els.byweekday.forEach(cb => {
+          cb.checked = preset.byweekday.includes(parseInt(cb.value));
+        });
+      }
+
+      updateOutput();
+    }
+
+    // Copy to clipboard
+    function copyToClipboard(targetId) {
+      const el = document.getElementById(targetId);
+      if (el) {
+        navigator.clipboard.writeText(el.textContent);
+        // Show feedback
+        const btn = document.querySelector(`[data-target="${targetId}"]`);
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = originalText, 1500);
+      }
+    }
+
+    // Toggle theme
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    // Load saved theme
+    function loadTheme() {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    }
+
+    // Event listeners
+    els.presets.addEventListener('change', (e) => applyPreset(e.target.value));
+    els.parseBtn.addEventListener('click', parseRRule);
+    els.clearBtn.addEventListener('click', clearForm);
+    els.themeToggle.addEventListener('click', toggleTheme);
+    els.endConditionCount.addEventListener('click', () => setEndCondition('count'));
+    els.endConditionUntil.addEventListener('click', () => setEndCondition('until'));
+    els.copyBtns.forEach(btn => {
+      btn.addEventListener('click', () => copyToClipboard(btn.dataset.target));
+    });
+
+    // Listen for form changes
+    const formInputs = [
+      els.freq, els.dtstartYear, els.dtstartMonth, els.dtstartDay,
+      els.interval, els.count, els.untilYear, els.untilMonth, els.untilDay,
+      els.wkst, els.bymonthday, els.bysetpos, els.skip, els.calendar
+    ];
+    formInputs.forEach(el => {
+      el.addEventListener('input', updateOutput);
+      // Add change listener for select elements (for better browser compatibility)
+      if (el.tagName === 'SELECT') {
+        el.addEventListener('change', updateOutput);
+      }
+    });
+    els.bymonth.forEach(cb => cb.addEventListener('change', updateOutput));
+    els.byweekday.forEach(cb => cb.addEventListener('change', updateOutput));
+
+    // Initialize
+    loadTheme();
+    updateOutput();
+
+    console.log('Hijri RRULE Demo loaded. Library exposed as window.HijriRRule and window.HijriDate');
+  </script>
+</body>
+</html>
