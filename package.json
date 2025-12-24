@@ -1,6 +1,6 @@
 {
   "name": "hijri-rrule",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A JavaScript library for working with recurrence rules (RRULE) for the Hijri (Islamic) calendar, compatible with RFC 5545",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
