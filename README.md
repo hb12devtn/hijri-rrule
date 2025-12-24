@@ -8,12 +8,17 @@ A JavaScript/TypeScript library for working with recurrence rules (RRULE) for th
 ## Features
 
 - **Full RRULE Support**: YEARLY, MONTHLY, WEEKLY, DAILY frequencies with BYMONTH, BYMONTHDAY, BYDAY, COUNT, UNTIL, INTERVAL
-- **Hijri Calendar**: Accurate Hijri date handling with leap year support (30-year cycle)
+- **Multiple Calendar Types**: Umm al-Qura (Saudi official) and Tabular (algorithmic) calendars
+- **Invalid Day Handling**: Skip, move backward, or move forward strategies for dates like "30th of 29-day month"
 - **Bidirectional Conversion**: Convert between Gregorian and Hijri dates
 - **API Compatible**: Mirrors the popular [rrule.js](https://github.com/jkbrzt/rrule) library API
 - **TypeScript**: Full TypeScript support with comprehensive type definitions
 - **NLP Support**: Human-readable text output in English and Arabic
 - **Zero Dependencies**: No external runtime dependencies
+
+## Demo
+
+Try the interactive demo: [https://hb12devtn.github.io/hijri-rrule/demo/](https://hb12devtn.github.io/hijri-rrule/demo/)
 
 ## Installation
 
@@ -45,13 +50,55 @@ const hijriDates = rule.allHijri();
 
 // Get string representation
 console.log(rule.toString());
-// DTSTART;CALENDAR=HIJRI:14460901
+// DTSTART;CALENDAR=HIJRI-UM-AL-QURA:14460901
 // RRULE:FREQ=YEARLY;BYMONTH=9;BYMONTHDAY=1;COUNT=5
 
 // Human-readable text
 console.log(rule.toText());
 // "every year in Ramadan on the 1st for 5 times"
 ```
+
+## Calendar Types
+
+The library supports two Islamic calendar calculation methods:
+
+### Umm al-Qura (Default)
+
+The official calendar of Saudi Arabia, based on astronomical calculations. This is the recommended option for most use cases.
+
+```typescript
+const rule = new HijriRRule({
+  freq: HijriRRule.YEARLY,
+  bymonth: 9,
+  bymonthday: 1,
+  dtstart: new HijriDate(1446, 9, 1),
+  count: 5,
+  calendar: 'islamic-umalqura'  // default
+});
+```
+
+### Tabular (Algorithmic)
+
+A purely mathematical calendar based on a 30-year cycle. Useful for historical calculations or when consistency with other systems is required.
+
+```typescript
+const rule = new HijriRRule({
+  freq: HijriRRule.YEARLY,
+  bymonth: 9,
+  bymonthday: 1,
+  dtstart: new HijriDate(1446, 9, 1),
+  count: 5,
+  calendar: 'islamic-tbla'
+});
+```
+
+### Differences
+
+Month lengths can differ between calendars. For example, Ramadan 1446:
+- **Umm al-Qura**: 29 days
+- **Tabular**: 30 days
+
+This affects which dates are valid and when occurrences are generated.
 
 ## API Reference
 
@@ -79,6 +126,8 @@ new HijriRRule(options: PartialOptions, noCache?: boolean)
 | `byweekday` | `Weekday \| Weekday[]` | Days of week (SA, SU, MO, TU, WE, TH, FR) |
 | `bysetpos` | `number \| number[]` | Position within frequency period |
 | `wkst` | `Weekday` | Week start day (default: SU) |
+| `calendar` | `'islamic-umalqura' \| 'islamic-tbla'` | Calendar type (default: umalqura) |
+| `skip` | `Skip` | Invalid day strategy: OMIT, FORWARD, BACKWARD (default: OMIT) |
 
 #### Methods
 
@@ -205,6 +254,45 @@ ruleSet.exdate(new HijriDate(1446, 3, 1));
 const dates = ruleSet.all();
 ```
 
+### Skip Strategy (Invalid Day Handling)
+
+When a rule specifies a day that doesn't exist in a month (e.g., day 30 in a 29-day month), the `skip` option controls the behavior:
+
+```typescript
+import { HijriRRule, HijriDate, Skip } from 'hijri-rrule';
+
+// OMIT (default): Skip invalid dates entirely
+const ruleOmit = new HijriRRule({
+  freq: HijriRRule.MONTHLY,
+  bymonthday: 30,
+  dtstart: new HijriDate(1446, 1, 30),
+  count: 3,
+  skip: Skip.OMIT
+});
+// Returns: Muharram 30, Rabi al-Awwal 30, Jumada al-Awwal 30
+// (Skips Safar, Rabi al-Thani - they have 29 days)
+
+// BACKWARD: Move to last day of month
+const ruleBackward = new HijriRRule({
+  freq: HijriRRule.MONTHLY,
+  bymonthday: 30,
+  dtstart: new HijriDate(1446, 1, 30),
+  count: 3,
+  skip: Skip.BACKWARD
+});
+// Returns: Muharram 30, Safar 29, Rabi al-Awwal 30
+
+// FORWARD: Move to 1st of next month
+const ruleForward = new HijriRRule({
+  freq: HijriRRule.MONTHLY,
+  bymonthday: 30,
+  dtstart: new HijriDate(1446, 1, 30),
+  count: 3,
+  skip: Skip.FORWARD
+});
+// Returns: Muharram 30, Rabi al-Awwal 1, Rabi al-Awwal 30
+```
+
 ### Parsing RRULE Strings
 
 ```typescript
@@ -212,8 +300,11 @@ import { hijriRuleStr, HijriRRule } from 'hijri-rrule';
 
 // Parse an RRULE string
 const rule = HijriRRule.fromString(
-  'DTSTART:14460901\nRRULE:FREQ=YEARLY;BYMONTH=9;BYMONTHDAY=1;COUNT=5'
+  'DTSTART;CALENDAR=HIJRI-UM-AL-QURA:14460901\nRRULE:FREQ=YEARLY;BYMONTH=9;BYMONTHDAY=1;COUNT=5'
 );
+
+// Calendar type is parsed from the string
+console.log(rule.options.calendar); // 'islamic-umalqura'
 
 // Or use hijriRuleStr for more options
 const ruleOrSet = hijriRuleStr('FREQ=YEARLY;BYMONTH=9', {
@@ -221,6 +312,19 @@ const ruleOrSet = hijriRuleStr('FREQ=YEARLY;BYMONTH=9', {
   forceset: true  // Always return RRuleSet
 });
 ```
+
+### RRULE String Format
+
+The library uses extended RRULE format with calendar type:
+
+```
+DTSTART;CALENDAR=HIJRI-UM-AL-QURA:14460901
+RRULE:FREQ=YEARLY;BYMONTH=9;BYMONTHDAY=1;COUNT=5
+```
+
+Calendar values:
+- `HIJRI-UM-AL-QURA` - Umm al-Qura calendar
+- `HIJRI-TABULAR` - Tabular calendar
 
 ## Hijri Calendar Reference
 
@@ -241,29 +345,13 @@ const ruleOrSet = hijriRuleStr('FREQ=YEARLY;BYMONTH=9', {
 | 11 | Dhu al-Qa'dah | ذُو القَعْدَة | 30 |
 | 12 | Dhu al-Hijjah | ذُو الحِجَّة | 29 (30 in leap years) |
 
-### Leap Years
+> **Note**: The above days are for the Tabular calendar. Umm al-Qura month lengths vary based on lunar observations.
 
-The Hijri calendar uses a 30-year cycle with 11 leap years: **2, 5, 7, 10, 13, 16, 18, 21, 24, 26, 29**
+### Leap Years (Tabular)
+
+The Tabular Hijri calendar uses a 30-year cycle with 11 leap years: **2, 5, 7, 10, 13, 16, 18, 21, 24, 26, 29**
 
 In leap years, Dhu al-Hijjah (month 12) has 30 days instead of 29.
-
-## Edge Cases
-
-### BYMONTHDAY=30 in 29-day months
-
-When a rule specifies day 30 but the month only has 29 days, the occurrence is **skipped**.
-
-```typescript
-const rule = new HijriRRule({
-  freq: HijriRRule.MONTHLY,
-  bymonthday: 30,
-  dtstart: new HijriDate(1446, 1, 30),
-  count: 3
-});
-
-// Returns: Muharram 30, Rabi al-Awwal 30, Jumada al-Awwal 30
-// (Safar, Rabi al-Thani skipped as they have 29 days)
-```
 
 ## Examples
 
@@ -294,6 +382,16 @@ const jumuah = new HijriRRule({
   byweekday: [HijriRRule.FR],
   dtstart: new HijriDate(1446, 1, 1),
   count: 52
+});
+
+// Last 10 nights of Ramadan (including Laylat al-Qadr)
+const lastTenNights = new HijriRRule({
+  freq: HijriRRule.YEARLY,
+  bymonth: HijriRRule.RAMADAN,
+  bymonthday: [21, 23, 25, 27, 29],  // Odd nights
+  dtstart: new HijriDate(1446, 9, 21),
+  count: 25,
+  skip: Skip.BACKWARD  // Handle 29-day Ramadan
 });
 ```
 
@@ -328,4 +426,5 @@ Contributions are welcome! Please open an issue or submit a pull request.
 ## Acknowledgments
 
 - Inspired by [rrule.js](https://github.com/jkbrzt/rrule)
-- Hijri calendar algorithm based on the [Tabular Islamic Calendar](https://en.wikipedia.org/wiki/Tabular_Islamic_calendar)
+- Umm al-Qura calendar data from [Intl.DateTimeFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat)
+- Tabular calendar algorithm based on the [Tabular Islamic Calendar](https://en.wikipedia.org/wiki/Tabular_Islamic_calendar)
