@@ -64,7 +64,7 @@ export type { CalendarConfig } from './calendar/config';
 export { getCalendarProvider } from './calendar/providers';
 
 // Types
-export { Frequency } from './types/frequency';
+export { Frequency, FrequencyStr, StrToFrequency } from './types/frequency';
 export { WeekdayNum } from './types/weekday';
 export type { WeekdaySpec } from './types/weekday';
 export { Skip } from './types/options';
