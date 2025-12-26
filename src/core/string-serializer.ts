@@ -1,8 +1,12 @@
-import { ParsedOptions, PartialOptions, HijriDateLike } from '../types/options';
-import { FrequencyStr } from '../types/frequency';
-import { WeekdayStr, WeekdaySpec } from '../types/weekday';
-import { HijriDate } from '../calendar/hijri-date';
-import { gregorianToHijri } from '../calendar/hijri-converter';
+import {
+  FrequencyStr,
+  HijriDateLike,
+  HijriRRuleParsedOptions,
+  HijriRRulePartialOptions,
+  WeekdaySpec,
+  WeekdayStr
+} from '../types';
+import {gregorianToHijri, HijriDate} from '../calendar';
 
 /**
  * Helper to convert Date or HijriDateLike to HijriDate
@@ -25,7 +29,7 @@ function toHijriDate(value: Date | HijriDateLike): HijriDate {
  * @returns RRULE string
  */
 export function optionsToString(
-  options: ParsedOptions | PartialOptions,
+  options: HijriRRuleParsedOptions | HijriRRulePartialOptions,
   includeDtstart: boolean = true
 ): string {
   const parts: string[] = [];
@@ -67,40 +71,40 @@ export function optionsToString(
   }
 
   // BYSETPOS
-  const bysetpos = (options as ParsedOptions).bysetpos;
+  const bysetpos = (options as HijriRRuleParsedOptions).bysetpos;
   if (bysetpos && bysetpos.length > 0) {
     rruleParts.push(`BYSETPOS=${bysetpos.join(',')}`);
   }
 
   // BYMONTH
-  const bymonth = (options as ParsedOptions).bymonth;
+  const bymonth = (options as HijriRRuleParsedOptions).bymonth;
   if (bymonth && bymonth.length > 0) {
     rruleParts.push(`BYMONTH=${bymonth.join(',')}`);
   }
 
   // BYMONTHDAY (combine positive and negative)
-  const bymonthday = (options as ParsedOptions).bymonthday || [];
-  const bynmonthday = (options as ParsedOptions).bynmonthday || [];
+  const bymonthday = (options as HijriRRuleParsedOptions).bymonthday || [];
+  const bynmonthday = (options as HijriRRuleParsedOptions).bynmonthday || [];
   const allMonthDays = [...bymonthday, ...bynmonthday];
   if (allMonthDays.length > 0) {
     rruleParts.push(`BYMONTHDAY=${allMonthDays.join(',')}`);
   }
 
   // BYYEARDAY
-  const byyearday = (options as ParsedOptions).byyearday;
+  const byyearday = (options as HijriRRuleParsedOptions).byyearday;
   if (byyearday && byyearday.length > 0) {
     rruleParts.push(`BYYEARDAY=${byyearday.join(',')}`);
   }
 
   // BYWEEKNO
-  const byweekno = (options as ParsedOptions).byweekno;
+  const byweekno = (options as HijriRRuleParsedOptions).byweekno;
   if (byweekno && byweekno.length > 0) {
     rruleParts.push(`BYWEEKNO=${byweekno.join(',')}`);
   }
 
   // BYDAY (combine simple and nth weekdays)
-  const byweekday = (options as ParsedOptions).byweekday || [];
-  const bynweekday = (options as ParsedOptions).bynweekday || [];
+  const byweekday = (options as HijriRRuleParsedOptions).byweekday || [];
+  const bynweekday = (options as HijriRRuleParsedOptions).bynweekday || [];
   const allWeekdays = [...byweekday, ...bynweekday];
   if (allWeekdays.length > 0) {
     const dayStrs = allWeekdays.map(formatWeekdaySpec);
@@ -108,19 +112,19 @@ export function optionsToString(
   }
 
   // BYHOUR
-  const byhour = (options as ParsedOptions).byhour;
+  const byhour = (options as HijriRRuleParsedOptions).byhour;
   if (byhour && byhour.length > 0) {
     rruleParts.push(`BYHOUR=${byhour.join(',')}`);
   }
 
   // BYMINUTE
-  const byminute = (options as ParsedOptions).byminute;
+  const byminute = (options as HijriRRuleParsedOptions).byminute;
   if (byminute && byminute.length > 0) {
     rruleParts.push(`BYMINUTE=${byminute.join(',')}`);
   }
 
   // BYSECOND
-  const bysecond = (options as ParsedOptions).bysecond;
+  const bysecond = (options as HijriRRuleParsedOptions).bysecond;
   if (bysecond && bysecond.length > 0) {
     rruleParts.push(`BYSECOND=${bysecond.join(',')}`);
   }
@@ -131,7 +135,7 @@ export function optionsToString(
   }
 
   // SKIP (only if not default 'omit')
-  const skip = (options as ParsedOptions).skip;
+  const skip = (options as HijriRRuleParsedOptions).skip;
   if (skip && skip !== 'omit') {
     rruleParts.push(`SKIP=${skip.toUpperCase()}`);
   }
@@ -155,7 +159,7 @@ function formatWeekdaySpec(spec: WeekdaySpec): string {
 /**
  * Convert options to RRULE string without DTSTART
  */
-export function rruleToString(options: ParsedOptions | PartialOptions): string {
+export function rruleToString(options: HijriRRuleParsedOptions | HijriRRulePartialOptions): string {
   const fullStr = optionsToString(options, true);
   const lines = fullStr.split('\n');
 
@@ -167,7 +171,7 @@ export function rruleToString(options: ParsedOptions | PartialOptions): string {
 /**
  * Get the RRULE property string only (without RRULE: prefix)
  */
-export function getPropertiesString(options: ParsedOptions | PartialOptions): string {
+export function getPropertiesString(options: HijriRRuleParsedOptions | HijriRRulePartialOptions): string {
   const rruleLine = rruleToString(options);
   return rruleLine.replace(/^RRULE:/, '');
 }

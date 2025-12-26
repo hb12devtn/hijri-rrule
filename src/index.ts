@@ -69,8 +69,8 @@ export { WeekdayNum } from './types/weekday';
 export type { WeekdaySpec } from './types/weekday';
 export { Skip } from './types/options';
 export type {
-  PartialOptions,
-  ParsedOptions,
+  HijriRRulePartialOptions,
+  HijriRRuleParsedOptions,
   RRuleStrOptions,
 } from './types/options';
 

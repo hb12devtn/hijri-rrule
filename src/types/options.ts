@@ -16,7 +16,7 @@ export interface HijriDateLike {
  * Options that can be passed to HijriRRule constructor
  * Partial options - not all fields are required
  */
-export interface PartialOptions {
+export interface HijriRRulePartialOptions {
   /** Recurrence frequency (required) */
   freq: Frequency;
 
@@ -80,7 +80,7 @@ export interface PartialOptions {
  * Fully parsed and normalized options
  * All arrays are normalized, defaults are applied
  */
-export interface ParsedOptions {
+export interface HijriRRuleParsedOptions {
   /** Recurrence frequency */
   freq: Frequency;
 

@@ -1,16 +1,16 @@
 import {
-  PartialOptions,
-  ParsedOptions,
+  Frequency,
   HijriDateLike,
+  HijriRRuleParsedOptions,
+  HijriRRulePartialOptions,
   Skip,
-} from '../types/options';
-import { Frequency } from '../types/frequency';
-import { WeekdayNum, WeekdaySpec } from '../types/weekday';
-import { HijriDate } from '../calendar/hijri-date';
-import { gregorianToHijri } from '../calendar/hijri-converter';
-import { HijriWeekday } from '../weekday/hijri-weekday';
-import { DEFAULT_WKST } from '../constants/weekday';
-import { getCalendarConfig } from '../calendar/config';
+  WeekdayNum,
+  WeekdaySpec,
+} from '../types';
+import {gregorianToHijri, HijriDate} from '../calendar';
+import {HijriWeekday} from '../weekday';
+import {DEFAULT_WKST} from '../constants';
+import {getCalendarConfig} from '../calendar/config';
 
 /**
  * Normalize a value to an array
@@ -109,7 +109,7 @@ function separateWeekdays(weekdays: WeekdaySpec[] | undefined): {
 /**
  * Validate options
  */
-function validateOptions(options: PartialOptions): void {
+function validateOptions(options: HijriRRulePartialOptions): void {
   // Frequency is required
   if (options.freq === undefined) {
     throw new Error('freq is required');
@@ -213,7 +213,7 @@ function validateOptions(options: PartialOptions): void {
  * @param options - Partial options from user
  * @returns Fully parsed and normalized options
  */
-export function parseOptions(options: PartialOptions): ParsedOptions {
+export function parseOptions(options: HijriRRulePartialOptions): HijriRRuleParsedOptions {
   // Validate first
   validateOptions(options);
 
@@ -238,7 +238,7 @@ export function parseOptions(options: PartialOptions): ParsedOptions {
   // Separate byweekday into simple and nth
   const weekdays = separateWeekdays(normalizeWeekdays(options.byweekday));
 
-  const parsed: ParsedOptions = {
+  return {
     freq: options.freq,
     dtstart,
     interval: options.interval ?? 1,
@@ -260,16 +260,14 @@ export function parseOptions(options: PartialOptions): ParsedOptions {
     skip: options.skip ?? Skip.OMIT,
     calendar: options.calendar ?? getCalendarConfig().defaultCalendar,
   };
-
-  return parsed;
 }
 
 /**
  * Convert ParsedOptions back to PartialOptions
  * Useful for cloning rules
  */
-export function optionsToPartial(parsed: ParsedOptions): PartialOptions {
-  const partial: PartialOptions = {
+export function optionsToPartial(parsed: HijriRRuleParsedOptions): HijriRRulePartialOptions {
+  const partial: HijriRRulePartialOptions = {
     freq: parsed.freq,
     dtstart: parsed.dtstart,
     interval: parsed.interval,

@@ -12,7 +12,7 @@ export {
 } from './options';
 export type {
   HijriDateLike,
-  PartialOptions,
-  ParsedOptions,
+  HijriRRulePartialOptions,
+  HijriRRuleParsedOptions,
   RRuleStrOptions,
 } from './options';

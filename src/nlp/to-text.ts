@@ -1,8 +1,6 @@
-import { ParsedOptions } from '../types/options';
-import { Frequency } from '../types/frequency';
-import { WeekdaySpec } from '../types/weekday';
-import { getI18n, I18nStrings } from './i18n';
-import { formatOrdinal } from '../constants/months';
+import {Frequency, HijriRRuleParsedOptions, WeekdaySpec} from '../types';
+import {getI18n, I18nStrings} from './i18n';
+import {formatOrdinal} from '../constants';
 
 /**
  * Convert parsed options to human-readable text
@@ -20,7 +18,7 @@ import { formatOrdinal } from '../constants/months';
  * // "كل سنة في ١ رمضان"
  * ```
  */
-export function toText(options: ParsedOptions, locale: 'en' | 'ar' = 'en'): string {
+export function toText(options: HijriRRuleParsedOptions, locale: 'en' | 'ar' = 'en'): string {
   const i18n = getI18n(locale);
   const parts: string[] = [];
 
@@ -69,7 +67,7 @@ export function toText(options: ParsedOptions, locale: 'en' | 'ar' = 'en'): stri
  * Build frequency phrase
  */
 function buildFrequencyPhrase(
-  options: ParsedOptions,
+  options: HijriRRuleParsedOptions,
   i18n: I18nStrings,
   locale: 'en' | 'ar'
 ): string {

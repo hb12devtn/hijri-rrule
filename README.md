@@ -7,7 +7,7 @@ A JavaScript/TypeScript library for working with recurrence rules (RRULE) for th
 
 ## Features
 
-- **Full RRULE Support**: YEARLY, MONTHLY, WEEKLY, DAILY frequencies with BYMONTH, BYMONTHDAY, BYDAY, COUNT, UNTIL, INTERVAL
+- **RRULE Support**: YEARLY, MONTHLY, WEEKLY, DAILY frequencies with BYMONTH, BYMONTHDAY, BYDAY, BYYEARDAY, BYSETPOS, COUNT, UNTIL, INTERVAL
 - **Multiple Calendar Types**: Umm al-Qura (Saudi official) and Tabular (algorithmic) calendars
 - **Invalid Day Handling**: Skip, move backward, or move forward strategies for dates like "30th of 29-day month"
 - **Bidirectional Conversion**: Convert between Gregorian and Hijri dates
@@ -414,6 +414,10 @@ console.log(gregorianDate.toDateString());
 ## Browser Support
 
 Works in all modern browsers and Node.js 16+.
+
+## Related Projects
+
+- **[flutter_hijri_rrule](https://github.com/hb12devtn/flutter_hijri_rrule)** - Flutter/Dart version of this library for mobile and desktop applications
 
 ## License
 

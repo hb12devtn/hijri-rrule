@@ -1,8 +1,6 @@
-import { PartialOptions, Skip } from '../types/options';
-import { Frequency, StrToFrequency } from '../types/frequency';
-import { StrToWeekday, WeekdaySpec } from '../types/weekday';
-import { HijriDate } from '../calendar/hijri-date';
-import { IslamicCalendarType } from '../calendar/types';
+import {Frequency, HijriRRulePartialOptions, Skip, StrToFrequency, StrToWeekday, WeekdaySpec} from '../types';
+import {HijriDate} from '../calendar';
+import {IslamicCalendarType} from '../calendar/types';
 
 /**
  * Parse an RRULE string into options
@@ -15,7 +13,7 @@ import { IslamicCalendarType } from '../calendar/types';
  * @param str - RRULE string to parse
  * @returns Partial options object
  */
-export function parseString(str: string): PartialOptions {
+export function parseString(str: string): HijriRRulePartialOptions {
   const lines = str.split(/[\r\n]+/).filter((line) => line.trim());
 
   let dtstart: HijriDate | undefined;
@@ -96,8 +94,8 @@ function parseDtstart(line: string): { date: HijriDate; calendar?: IslamicCalend
  * @param str - The properties string like "FREQ=YEARLY;BYMONTH=9;COUNT=5"
  * @returns Partial options object
  */
-function parseRRuleProperties(str: string): PartialOptions {
-  const options: PartialOptions = {} as PartialOptions;
+function parseRRuleProperties(str: string): HijriRRulePartialOptions {
+  const options: HijriRRulePartialOptions = {} as HijriRRulePartialOptions;
 
   const parts = str.split(';').filter((p) => p.trim());
 
@@ -272,7 +270,7 @@ function parseByDay(value: string): WeekdaySpec[] {
  * Try to parse a string as either an RRULE or just the properties
  * Returns null if parsing fails
  */
-export function tryParseString(str: string): PartialOptions | null {
+export function tryParseString(str: string): HijriRRulePartialOptions | null {
   try {
     return parseString(str);
   } catch {

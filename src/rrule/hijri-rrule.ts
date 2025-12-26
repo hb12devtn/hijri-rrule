@@ -1,20 +1,32 @@
-import { PartialOptions, ParsedOptions, HijriDateLike } from '../types/options';
-import { HijriDate } from '../calendar/hijri-date';
-import { gregorianToHijri, hijriToGregorian } from '../calendar/hijri-converter';
-import { HijriWeekday } from '../weekday/hijri-weekday';
-import { parseOptions, optionsToPartial } from '../core/options-parser';
-import { parseString } from '../core/string-parser';
-import { optionsToString } from '../core/string-serializer';
-import { iterate, getAfter, getBefore } from '../core/iterator';
-import { RRuleCache } from '../core/cache';
+import {HijriDateLike, HijriRRuleParsedOptions, HijriRRulePartialOptions} from '../types';
+import {gregorianToHijri, HijriDate, hijriToGregorian} from '../calendar';
+import {HijriWeekday} from '../weekday';
+import {
+  getAfter,
+  getBefore,
+  iterate,
+  optionsToPartial,
+  optionsToString,
+  parseOptions,
+  parseString,
+  RRuleCache
+} from '../core';
 
 // Import constants for static properties
-import { YEARLY, MONTHLY, WEEKLY, DAILY, HOURLY, MINUTELY, SECONDLY } from '../constants/frequency';
-import { SA, SU, MO, TU, WE, TH, FR } from '../constants/weekday';
+import {DAILY, FR, HOURLY, MINUTELY, MO, MONTHLY, SA, SECONDLY, SU, TH, TU, WE, WEEKLY, YEARLY} from '../constants';
 import {
-  MUHARRAM, SAFAR, RABI_AL_AWWAL, RABI_AL_THANI,
-  JUMADA_AL_AWWAL, JUMADA_AL_THANI, RAJAB, SHABAN,
-  RAMADAN, SHAWWAL, DHU_AL_QADAH, DHU_AL_HIJJAH
+  DHU_AL_HIJJAH,
+  DHU_AL_QADAH,
+  JUMADA_AL_AWWAL,
+  JUMADA_AL_THANI,
+  MUHARRAM,
+  RABI_AL_AWWAL,
+  RABI_AL_THANI,
+  RAJAB,
+  RAMADAN,
+  SAFAR,
+  SHABAN,
+  SHAWWAL
 } from '../constants/months';
 
 /**
@@ -72,10 +84,10 @@ export class HijriRRule {
   static readonly DHU_AL_HIJJAH = DHU_AL_HIJJAH;
 
   /** Parsed options */
-  public readonly options: ParsedOptions;
+  public readonly options: HijriRRuleParsedOptions;
 
   /** Original options passed to constructor */
-  public readonly origOptions: PartialOptions;
+  public readonly origOptions: HijriRRulePartialOptions;
 
   /** Cache for computed results */
   private cache: RRuleCache | null = null;
@@ -86,7 +98,7 @@ export class HijriRRule {
    * @param options - Rule options
    * @param noCache - If true, disable caching (default: false)
    */
-  constructor(options: PartialOptions, noCache: boolean = false) {
+  constructor(options: HijriRRulePartialOptions, noCache: boolean = false) {
     this.origOptions = { ...options };
     this.options = parseOptions(options);
 
@@ -368,7 +380,7 @@ export class HijriRRule {
    * @param str - RRULE string
    * @returns Partial options object
    */
-  static parseString(str: string): PartialOptions {
+  static parseString(str: string): HijriRRulePartialOptions {
     return parseString(str);
   }
 
@@ -378,7 +390,7 @@ export class HijriRRule {
    * @param options - Partial or parsed options
    * @returns RRULE string
    */
-  static optionsToString(options: PartialOptions | ParsedOptions): string {
+  static optionsToString(options: HijriRRulePartialOptions | HijriRRuleParsedOptions): string {
     return optionsToString(options);
   }
 

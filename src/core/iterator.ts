@@ -1,15 +1,15 @@
-import { ParsedOptions, Skip } from '../types/options';
-import { Frequency } from '../types/frequency';
-import { HijriDate } from '../calendar/hijri-date';
+import {Frequency, HijriRRuleParsedOptions, Skip} from '../types';
 import {
   addDays,
   addMonths,
   addYears,
   dayOfWeek,
-  nthWeekdayOfMonth,
-} from '../calendar/hijri-date-math';
-import { getMonthLength, getYearLength } from '../calendar/hijri-calendar';
-import { IslamicCalendarType } from '../calendar/types';
+  getMonthLength,
+  getYearLength,
+  HijriDate,
+  nthWeekdayOfMonth
+} from '../calendar';
+import {IslamicCalendarType} from '../calendar/types';
 
 /**
  * Generate recurrence occurrences based on parsed options
@@ -17,7 +17,7 @@ import { IslamicCalendarType } from '../calendar/types';
  * @param options - Parsed RRULE options
  * @yields HijriDate occurrences
  */
-export function* iterate(options: ParsedOptions): Generator<HijriDate> {
+export function* iterate(options: HijriRRuleParsedOptions): Generator<HijriDate> {
   let count = 0;
   let current = HijriDate.from(options.dtstart);
 
@@ -83,7 +83,7 @@ export function* iterate(options: ParsedOptions): Generator<HijriDate> {
  */
 function generateCandidates(
   periodStart: HijriDate,
-  options: ParsedOptions
+  options: HijriRRuleParsedOptions
 ): HijriDate[] {
   switch (options.freq) {
     case Frequency.YEARLY:
@@ -105,7 +105,7 @@ function generateCandidates(
  */
 function generateYearlyCandidates(
   periodStart: HijriDate,
-  options: ParsedOptions
+  options: HijriRRuleParsedOptions
 ): HijriDate[] {
   const year = periodStart.year;
   let candidates: HijriDate[] = [];
@@ -201,7 +201,7 @@ function generateYearlyCandidates(
  */
 function generateMonthlyCandidates(
   periodStart: HijriDate,
-  options: ParsedOptions
+  options: HijriRRuleParsedOptions
 ): HijriDate[] {
   const year = periodStart.year;
   const month = periodStart.month;
@@ -258,7 +258,7 @@ function generateMonthlyCandidates(
  */
 function generateWeeklyCandidates(
   periodStart: HijriDate,
-  options: ParsedOptions
+  options: HijriRRuleParsedOptions
 ): HijriDate[] {
   const candidates: HijriDate[] = [];
 
@@ -285,7 +285,7 @@ function generateWeeklyCandidates(
  */
 function generateDailyCandidates(
   periodStart: HijriDate,
-  options: ParsedOptions
+  options: HijriRRuleParsedOptions
 ): HijriDate[] {
   // For daily, the candidate is just the current day
   const candidate = periodStart;
@@ -444,7 +444,7 @@ function sortAndDedupe(dates: HijriDate[]): HijriDate[] {
  * Get all occurrences up to a limit
  */
 export function getAll(
-  options: ParsedOptions,
+  options: HijriRRuleParsedOptions,
   limit: number = 1000
 ): HijriDate[] {
   const result: HijriDate[] = [];
@@ -463,7 +463,7 @@ export function getAll(
  * Get occurrences between two dates
  */
 export function getBetween(
-  options: ParsedOptions,
+  options: HijriRRuleParsedOptions,
   after: HijriDate,
   before: HijriDate,
   inclusive: boolean = false
@@ -499,7 +499,7 @@ export function getBetween(
  * Get first occurrence after a date
  */
 export function getAfter(
-  options: ParsedOptions,
+  options: HijriRRuleParsedOptions,
   dt: HijriDate,
   inclusive: boolean = false
 ): HijriDate | null {
@@ -515,7 +515,7 @@ export function getAfter(
  * Get last occurrence before a date
  */
 export function getBefore(
-  options: ParsedOptions,
+  options: HijriRRuleParsedOptions,
   dt: HijriDate,
   inclusive: boolean = false
 ): HijriDate | null {
